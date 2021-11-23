@@ -50,9 +50,9 @@ public class Circle: MonoBehaviour {
         targetPos = transform.position;
         DrawCircle();
         if(neural != null)
-            this.neural = new NeuralNetwork(neural, true);
+            this.neural = new NeuralNetwork(neural, 0.5f);
         else
-            this.neural = new NeuralNetwork(2,2,2);
+            this.neural = new NeuralNetwork(4,8,2);
             
         //Задержка перед началом движения/поворота объекта.
         this.time -= time;  
@@ -207,23 +207,38 @@ public class Circle: MonoBehaviour {
 
 
 
-    Vector2 СlosestFood(Collider2D[] colliders)
+    Vector2[] СlosestFood(Collider2D[] colliders)
     {   
-        Vector2 result = new Vector2(100, 100);
+        Vector2[] result = new Vector2[2];
+        result[0] = new Vector2(100, 100);
+        result[1]= Vector2.zero;
+        
         if(nearestColliders != null)
         {
             for(int i = 0; i < colliders.Length; i++)
             {
-                if(colliders[i].name == "Food(Clone)" && ((Vector2)colliders[i].transform.position-(Vector2)transform.position).magnitude < result.magnitude)
+                if(colliders[i].name == "Food(Clone)")
                 {
-                    result = (Vector2)colliders[i].transform.position-(Vector2)transform.position;
+                    Vector2 t = ((Vector2)colliders[i].transform.position-(Vector2)transform.position);
+                    if( t.magnitude < result[0].magnitude)
+                    {
+                        result[0] = (Vector2)colliders[i].transform.position-(Vector2)transform.position;
+                    }
+                    result[1] += t;
                 }
+                
+                
+                
             }
-            if(result == new Vector2(100, 100)) result = Vector2.zero;
+            if(result[0] == new Vector2(100, 100)) result[0] = Vector2.zero;
         }
-        else result = Vector2.zero;   
+        else result[0] = Vector2.zero;
+        result[0].Normalize();
+        result[1].Normalize();
         return result;
     }
+
+
     void Update()
     {
         time += Time.deltaTime;
@@ -236,12 +251,11 @@ public class Circle: MonoBehaviour {
             {
                 
                 
-                Vector2 t;
+                Vector2[] t;
                 nearestColliders = Physics2D.OverlapCircleAll(transform.position, 10f);
                 t = СlosestFood(nearestColliders);
-                if(t == Vector2.zero)
-                    t = new Vector2(Random.Range(-10f,10f), Random.Range(-10f,10f));
-                float[] p = neural.FeedForward(t.x/10f, t.y/10f);
+                
+                float[] p = neural.FeedForward(t[0].x, t[0].y, t[1].x, t[1].y);
                 targetPos.x = transform.position.x + p[0]*25f;
                 targetPos.y = transform.position.y + p[1]*25f;
                 time = 0;

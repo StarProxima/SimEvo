@@ -18,11 +18,15 @@ public class Spawn : MonoBehaviour
     public int foodCount = 0;
     public float foodAreaWidth = 1000f;
     public float foodAreaHeight = 600f;
-    public float foodDeltaTime = 0.1f;
+    public float foodPerSec = 10;
 
-    [SerializeField] float foodGroupSize = 10;
+    public float ratioFood = 0f;
+
+    [SerializeField] bool foodGroupSpawn = false;
+    public int foodGroupSize = 10;
     float circleTime = 0;
     float foodTime = 0;
+    Vector3 randPos;
     void Start()
     {
         circle = (GameObject)Resources.Load("Circle", typeof(GameObject));
@@ -64,13 +68,27 @@ public class Spawn : MonoBehaviour
         if(foodCount < maxFoodCount && foodSpawn)
         {
             foodTime += Time.deltaTime;
-            if(foodTime > foodDeltaTime)
-            {
-                for(int i = 0; i < foodGroupSize; i++)
+            if(foodTime > foodGroupSize/(float)foodPerSec)
+            {   
+                if(Random.value > ratioFood)
                 {
-                    Instantiate(food, new Vector3(Random.Range(-foodAreaWidth/2, foodAreaWidth/2), Random.Range(-foodAreaHeight/2, foodAreaHeight/2), 100), Quaternion.Euler(0,0,Random.Range(0,360)));
-                    foodCount++;
+                    for(int i = 0; i < foodGroupSize; i++)
+                    {
+                        Instantiate(food, new Vector3(Random.Range(-foodAreaWidth/2, foodAreaWidth/2), Random.Range(-foodAreaHeight/2, foodAreaHeight/2), 100), Quaternion.Euler(0,0,Random.Range(0,360)));
+                    }
                 }
+                else
+                {
+                    randPos = new Vector3(Random.Range(-foodAreaWidth/2, foodAreaWidth/2), Random.Range(-foodAreaHeight/2, foodAreaHeight/2), 100);
+                    for(int i = 0; i < foodGroupSize; i++)
+                    {
+                        randPos = randPos + new Vector3(Random.Range(-Mathf.Log(foodGroupSize,2), Mathf.Log(foodGroupSize,2)),Random.Range(-Mathf.Log(foodGroupSize,2), Mathf.Log(foodGroupSize,2)),0);
+                        Instantiate(food, randPos, Quaternion.Euler(0,0,Random.Range(0,360)));
+                    }
+                } 
+                //if(foodGroupSpawn) randPos = new Vector3(Random.Range(-foodAreaWidth/2, foodAreaWidth/2), Random.Range(-foodAreaHeight/2, foodAreaHeight/2), 100);
+                    
+                foodCount+=foodGroupSize;
                 foodTime = 0;
             }
         }

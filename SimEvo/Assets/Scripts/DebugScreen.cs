@@ -10,6 +10,7 @@ public class DebugScreen : MonoBehaviour {
  
     void Start() {
         QualitySettings.vSyncCount = 0;
+        Application.runInBackground = true;
         Application.targetFrameRate = 1200;
 
         for (int i = 0; i < 5; i++)

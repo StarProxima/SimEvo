@@ -50,9 +50,9 @@ public class NeuralNetwork
         }
     }
 
-    public NeuralNetwork(NeuralNetwork neural, bool mutation = false)
+    public NeuralNetwork(NeuralNetwork neural, float mutation = 0)
     {
-        float rand1 = UnityEngine.Random.value;
+        
         layers = new Layer[neural.layers.Length];
         for (int i = 0; i < neural.layers.Length; i++)
         {
@@ -77,21 +77,20 @@ public class NeuralNetwork
                 for (int k = 0; k < nextSize; k++)
                 {
                     float w = neural.layers[i].weights[j,k];
-                    if(mutation && rand1 < 0.5f)
-                    {
-                        float rand2 = UnityEngine.Random.value;
+
+                    float rand = UnityEngine.Random.value;
                         
-                        if(rand2 < 0.25)
-                            layers[i].weights[j, k] = w + UnityEngine.Random.Range(-0.05f, 0.05f);
-                            //layers[i].weights[j, k] = w + UnityEngine.Random.Range(-Mathf.Min(0.05f, 1 + w), Mathf.Min(0.05f, 1 - w));
-                        if(rand2 < 0.1)
-                            layers[i].weights[j, k] = w + UnityEngine.Random.Range(-0.5f, 0.5f);
-                            //layers[i].weights[j, k] = w + UnityEngine.Random.Range(-Mathf.Min(0.5f, 1 + w), Mathf.Min(0.5f, 1 - w));
-                    }
-                    else
-                    {
-                        layers[i].weights[j, k] = w;
-                    } 
+                    if(rand < 1f * mutation)
+                        layers[i].weights[j, k] = w + UnityEngine.Random.Range(-0.25f * mutation, 0.25f * mutation);
+                        //layers[i].weights[j, k] = w + UnityEngine.Random.Range(-Mathf.Min(0.05f, 1 + w), Mathf.Min(0.05f, 1 - w));
+                    if(rand < 0.2f * mutation)
+                        layers[i].weights[j, k] = w + UnityEngine.Random.Range(-2f * mutation, 2f * mutation);
+                        //layers[i].weights[j, k] = w + UnityEngine.Random.Range(-Mathf.Min(0.5f, 1 + w), Mathf.Min(0.5f, 1 - w));
+                    
+                    // else
+                    // {
+                    //     layers[i].weights[j, k] = w;
+                    // } 
                 }
             }
         }
