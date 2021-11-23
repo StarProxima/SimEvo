@@ -47,8 +47,8 @@ public class DebugScreen : MonoBehaviour {
 
         if(timer >= 0.1f)
         {
-            circlesCounter = Camera.main.GetComponent<Spawn>().circleCount;
-            foodsCounter = Camera.main.GetComponent<Spawn>().foodCount;
+            circlesCounter = GetComponent<Spawn>().circleCount;
+            foodsCounter = GetComponent<Spawn>().foodCount;
             timer = 0;
         }
     }

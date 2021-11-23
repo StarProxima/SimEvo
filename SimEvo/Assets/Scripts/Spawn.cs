@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Spawn : MonoBehaviour
 {
-    public GameObject circle;
+    GameObject circle;
     public bool circleSpawn = true;
     public int maxCircleCount = 10000;
     public int circleCount = 0;
@@ -12,7 +12,7 @@ public class Spawn : MonoBehaviour
     public float circleAreaHeight = 600f;
     public float circleDeltaTime = 1f;
 
-    public GameObject food;
+    GameObject food;
     public bool foodSpawn = true;
     public int maxFoodCount = 10000;
     public int foodCount = 0;
@@ -25,7 +25,8 @@ public class Spawn : MonoBehaviour
     float foodTime = 0;
     void Start()
     {
-        //StartCoroutine(SpawnFoodProcess());
+        circle = (GameObject)Resources.Load("Circle", typeof(GameObject));
+        food = (GameObject)Resources.Load("Food", typeof(GameObject));
     }
 
     // IEnumerator SpawnFoodProcess()

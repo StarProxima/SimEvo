@@ -4,10 +4,9 @@ using System.Collections.Generic;
 
 public class Circle: MonoBehaviour {
 
-    [SerializeField] GameObject circle;
+    [SerializeField] GameObject manager;
     NeuralNetwork neural;
 
-    Genome genome;
     //Parametrs
     [SerializeField] float energy = 20;
     float maxEnergy = 100;
@@ -41,19 +40,22 @@ public class Circle: MonoBehaviour {
     Collider2D[] nearestColliders;
 
     Rigidbody2D rb;
+    GameObject circle;
 
-    public void Initialization(NeuralNetwork neural = null)
+    public void Initialization(NeuralNetwork neural = null, float time = 0)
     {
         rb = gameObject.GetComponent<Rigidbody2D>();
+        circle = (GameObject)Resources.Load("Circle", typeof(GameObject));
+        manager = Camera.main.GetComponent<CamControl>().manager;
         targetPos = transform.position;
         DrawCircle();
         if(neural != null)
             this.neural = new NeuralNetwork(neural, true);
         else
-            this.neural = new NeuralNetwork(2,4,2);
+            this.neural = new NeuralNetwork(2,2,2);
             
         //Задержка перед началом движения/поворота объекта.
-        //this.time -= time;  
+        this.time -= time;  
     }
     void DrawCircle()
     {
@@ -89,7 +91,7 @@ public class Circle: MonoBehaviour {
     void OnTriggerEnter2D(Collider2D col)
     {
         EnergyChange(5);
-        Camera.main.GetComponent<Spawn>().foodCount--;
+        manager.GetComponent<Spawn>().foodCount--;
         Destroy(col.gameObject);
     }
 
@@ -160,9 +162,9 @@ public class Circle: MonoBehaviour {
 
     void Reproduction()
     {
-        GameObject t = (GameObject)Instantiate(Resources.Load("Circle", typeof(GameObject)), new Vector3(transform.position.x, transform.position.y, 100), Quaternion.identity);
+        GameObject t = Instantiate(circle, new Vector3(transform.position.x, transform.position.y, 100), Quaternion.identity);
         t.GetComponent<Circle>().Initialization(neural);
-        Camera.main.GetComponent<Spawn>().circleCount++;
+        manager.GetComponent<Spawn>().circleCount++;
     }
     void EnergyChange(float energy)
     {
@@ -197,7 +199,7 @@ public class Circle: MonoBehaviour {
         {
             if(energyDeath)
             {
-                Camera.main.GetComponent<Spawn>().circleCount--;
+                manager.GetComponent<Spawn>().circleCount--;
                 Destroy(gameObject);
             }
         }
@@ -206,16 +208,20 @@ public class Circle: MonoBehaviour {
 
 
     Vector2 СlosestFood(Collider2D[] colliders)
-    {
+    {   
         Vector2 result = new Vector2(100, 100);
-        for(int i = 0; i < colliders.Length; i++)
+        if(nearestColliders != null)
         {
-            if(colliders[i].name == "Food(Clone)" && ((Vector2)colliders[i].transform.position-(Vector2)transform.position).magnitude < result.magnitude)
+            for(int i = 0; i < colliders.Length; i++)
             {
-                result = (Vector2)colliders[i].transform.position-(Vector2)transform.position;
+                if(colliders[i].name == "Food(Clone)" && ((Vector2)colliders[i].transform.position-(Vector2)transform.position).magnitude < result.magnitude)
+                {
+                    result = (Vector2)colliders[i].transform.position-(Vector2)transform.position;
+                }
             }
+            if(result == new Vector2(100, 100)) result = Vector2.zero;
         }
-        if(result == new Vector2(100, 100)) result = Vector2.zero;
+        else result = Vector2.zero;   
         return result;
     }
     void Update()
@@ -230,12 +236,11 @@ public class Circle: MonoBehaviour {
             {
                 
                 
-                Vector2 t = new Vector2(Random.Range(-10f,10f), Random.Range(-10f,10f));
+                Vector2 t;
                 nearestColliders = Physics2D.OverlapCircleAll(transform.position, 10f);
-                if(nearestColliders.Length > 0)
-                {
-                    t = СlosestFood(nearestColliders);
-                }
+                t = СlosestFood(nearestColliders);
+                if(t == Vector2.zero)
+                    t = new Vector2(Random.Range(-10f,10f), Random.Range(-10f,10f));
                 float[] p = neural.FeedForward(t.x/10f, t.y/10f);
                 targetPos.x = transform.position.x + p[0]*25f;
                 targetPos.y = transform.position.y + p[1]*25f;

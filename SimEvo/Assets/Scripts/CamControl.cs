@@ -6,6 +6,7 @@ using System;
 
 public class CamControl : MonoBehaviour
 {
+    public GameObject manager;
     public GameObject targetObj;
 
     [SerializeField] float minSize = 0.5f, maxSize = 30;
@@ -33,7 +34,7 @@ public class CamControl : MonoBehaviour
 
     void Start()
     {
-        ih = Camera.main.GetComponent<InputHandler>();
+        ih = manager.GetComponent<InputHandler>();
         
         Camera.main.orthographicSize = startCamSize;
         futureSize = startCamSize;
