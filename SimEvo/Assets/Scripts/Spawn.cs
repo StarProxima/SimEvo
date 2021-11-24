@@ -51,6 +51,10 @@ public class Spawn : MonoBehaviour
     //     }
     // }
     
+    public void RemoveFood()
+    {
+        foodCount--;
+    }
     void Update()
     {
         if(circleCount < maxCircleCount && circleSpawn)

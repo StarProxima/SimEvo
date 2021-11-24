@@ -4342,17 +4342,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   circleSpawn: 1
-  maxCircleCount: 2000
+  maxCircleCount: 1000
   circleCount: 0
-  circleAreaWidth: 1200
+  circleAreaWidth: 1000
   circleAreaHeight: 800
   circleDeltaTime: 0.01
   foodSpawn: 1
   maxFoodCount: 25000
   foodCount: 0
-  foodAreaWidth: 1200
+  foodAreaWidth: 1000
   foodAreaHeight: 800
-  foodPerSec: 10
+  foodPerSec: 0
   ratioFood: 0
   foodGroupSpawn: 1
   foodGroupSize: 10

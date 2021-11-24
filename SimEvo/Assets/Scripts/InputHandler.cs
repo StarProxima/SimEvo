@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+
 //using UnityEngine.EventSystems;
 
 public class InputHandler : MonoBehaviour
@@ -10,9 +11,9 @@ public class InputHandler : MonoBehaviour
 
     [SerializeField] GameObject MobileUI;
 
-    public bool isUI = false;
     
-    //int lastFingerId = 0;
+    
+     
 
     
     public void SpawnFood(bool b)
@@ -44,27 +45,9 @@ public class InputHandler : MonoBehaviour
     }
     public bool Pointer()
     {
-        switch(platform)
-        {
-            case RuntimePlatform.WindowsEditor:
-            case RuntimePlatform.WindowsPlayer:
-            case RuntimePlatform.OSXEditor:
-            case RuntimePlatform.OSXPlayer:
-                if (Input.GetMouseButton(1))
-                    return true;
-            break;
+        if (Input.GetMouseButton(1))
+            return true;
 
-            case RuntimePlatform.Android:
-            case RuntimePlatform.IPhonePlayer:
-                if (Input.touchCount == 1)
-                {
-                    if((Input.GetTouch(0).phase == TouchPhase.Moved || Input.GetTouch(0).phase == TouchPhase.Stationary) && !isUI)
-                    {
-                        return true;
-                    }
-                }
-            break;
-        }
         return false;
     }
 
