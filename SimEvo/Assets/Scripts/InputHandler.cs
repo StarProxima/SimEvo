@@ -2,20 +2,48 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-
 //using UnityEngine.EventSystems;
 
 public class InputHandler : MonoBehaviour
 {
     RuntimePlatform platform = Application.platform;
 
-    [SerializeField] GameObject MobileUI;
+    
 
     
-    
+    [SerializeField] GameObject foodUI, shapeUI; 
      
 
-    
+    public void InputDropdown(int x)
+    {
+        foodUI.SetActive(false);
+        shapeUI.SetActive(false);
+        if(x == 0)
+        {
+            foodUI.SetActive(true);
+        }
+        else if(x == 1)
+        {
+            shapeUI.SetActive(true);
+        }
+    }
+
+    public void InputShapePerSec(string s)
+    {
+        if(s != null && s != "")
+            GetComponent<Spawn>().shapePerSec = Convert.ToInt32(s); 
+    }
+    public void InputSpawnShape(bool b)
+    {
+        GetComponent<Spawn>().shapeSpawn = b; 
+    }
+
+    public void InputMaxShape(string s)
+    {
+        if(s != null && s != "")
+            GetComponent<Spawn>().maxShapeCount = Convert.ToInt32(s); 
+    }
+
     public void SpawnFood(bool b)
     {
         GetComponent<Spawn>().foodSpawn = b;
@@ -23,20 +51,24 @@ public class InputHandler : MonoBehaviour
     }
     public void InputRatio(float f)
     {
+        
         GetComponent<Spawn>().ratioFood = f;
         
     }
     public void InputMaxFood(string s)
     {
-        GetComponent<Spawn>().maxFoodCount = Convert.ToInt32(s);
+        if(s != null && s != "")
+            GetComponent<Spawn>().maxFoodCount = Convert.ToInt32(s);
     }
     public void InputFoodPerSec(string s)
     {
-        GetComponent<Spawn>().foodPerSec = Convert.ToInt32(s);
+        if(s != null && s != "")
+            GetComponent<Spawn>().foodPerSec = Convert.ToInt32(s);
     }
     public void InputGroupSize(string s)
     {
-        GetComponent<Spawn>().foodGroupSize = Convert.ToInt32(s);
+        if(s != null && s != "")
+            GetComponent<Spawn>().foodGroupSize = Convert.ToInt32(s);
     }
 
     void Start()

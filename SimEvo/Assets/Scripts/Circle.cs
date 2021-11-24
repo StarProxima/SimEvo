@@ -7,6 +7,8 @@ public class Circle: MonoBehaviour {
     [SerializeField] GameObject manager;
     NeuralNetwork neural;
 
+    
+
     //Parametrs
     [SerializeField] float energy = 20;
     float maxEnergy = 100;
@@ -14,7 +16,8 @@ public class Circle: MonoBehaviour {
     float maxRotateSpeed = 25;
     [SerializeField] bool energyDeath = true;
 
-    
+    //Stats
+    public int generation = 0;
     //Draw
     int vertexCount = 16;
     int vertexCountEye = 24;
@@ -59,7 +62,7 @@ public class Circle: MonoBehaviour {
         float foodValue = col.gameObject.GetComponent<Food>().Eat();
         if(foodValue != 0)
             spawn.foodCount--;
-        EnergyChange(foodValue*0.5f);
+        EnergyChange(foodValue*0.35f);
         
     }
 
@@ -67,8 +70,11 @@ public class Circle: MonoBehaviour {
     {
         GameObject t = Instantiate(circle, new Vector3(transform.position.x, transform.position.y, 100), Quaternion.identity);
         t.GetComponent<Circle>().Initialization(neural, 1f);
-        manager.GetComponent<Spawn>().circleCount++;
+        t.GetComponent<Circle>().generation++;
+        spawn.circleCount++;
     }
+
+
     void EnergyChange(float energy)
     {
         if(this.energy + energy > maxEnergy)
@@ -78,13 +84,9 @@ public class Circle: MonoBehaviour {
         else
         {
             if(this.energy + energy < 0)
-            {
-                this.energy = 0;
-            }   
+                this.energy = 0;  
             else
-            {
-                this.energy += energy;
-            }    
+                this.energy += energy;   
         }   
     }
     void EnergyControl()
@@ -95,7 +97,7 @@ public class Circle: MonoBehaviour {
             if(energy > 70)
             {
                 Reproduction();
-                EnergyChange(-30);
+                EnergyChange(-50);
             }
         }
         else

@@ -5,12 +5,13 @@ using UnityEngine;
 public class Spawn : MonoBehaviour
 {
     GameObject circle;
-    public bool circleSpawn = true;
-    public int maxCircleCount = 10000;
+    public bool shapeSpawn = false;
+    public int maxShapeCount = 1000;
     public int circleCount = 0;
     public float circleAreaWidth = 1000f;
     public float circleAreaHeight = 600f;
-    public float circleDeltaTime = 1f;
+    
+    public float shapePerSec = 10f; 
 
     GameObject food;
     public bool foodSpawn = true;
@@ -24,7 +25,7 @@ public class Spawn : MonoBehaviour
 
     [SerializeField] bool foodGroupSpawn = false;
     public int foodGroupSize = 10;
-    float circleTime = 0;
+    float shapeTime = 0;
     float foodTime = 0;
     Vector3 randPos;
     void Start()
@@ -51,28 +52,25 @@ public class Spawn : MonoBehaviour
     //     }
     // }
     
-    public void RemoveFood()
-    {
-        foodCount--;
-    }
+    
     void Update()
     {
-        if(circleCount < maxCircleCount && circleSpawn)
+        if(circleCount < maxShapeCount && shapeSpawn)
         {
-            circleTime += Time.deltaTime;
-            if(circleTime > circleDeltaTime)
+            shapeTime += Time.deltaTime;
+            if(shapeTime > 1f/shapePerSec)
             {
                 GameObject t = Instantiate(circle, new Vector3(Random.Range(-foodAreaWidth/2, foodAreaWidth/2), Random.Range(-foodAreaHeight/2, foodAreaHeight/2), 100), Quaternion.identity);
                 t.GetComponent<Circle>().Initialization();
                 circleCount++;
-                circleTime = 0;
+                shapeTime = 0;
             }
         } 
 
         if(foodCount < maxFoodCount && foodSpawn)
         {
             foodTime += Time.deltaTime;
-            if(foodTime > foodGroupSize/(float)foodPerSec)
+            if(foodTime > foodGroupSize/foodPerSec)
             {   
                 if(Random.value > ratioFood)
                 {
