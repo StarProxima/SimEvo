@@ -18,6 +18,13 @@ public class Circle: MonoBehaviour {
 
     //Stats
     public int generation = 0;
+    public int reproductionCount = 0;
+    public float lifetime = 0;
+    public int neuronCount = 0;
+    
+    public int foodEaten = 0;
+    
+
     //Draw
     int vertexCount = 16;
     int vertexCountEye = 24;
@@ -46,9 +53,15 @@ public class Circle: MonoBehaviour {
         
         //DrawCircle();
         if(neural != null)
+        {
             this.neural = new NeuralNetwork(neural, 0.5f);
+        }  
         else
-            this.neural = new NeuralNetwork(0, 4, Random.Range(2,8), 2);
+        {
+            neuronCount = Random.Range(2,8);
+            this.neural = new NeuralNetwork(0, 4, neuronCount, 2);
+        }
+            
             
         //Задержка перед началом движением.
         this.time -= time;  
@@ -61,16 +74,22 @@ public class Circle: MonoBehaviour {
         shape.rb.velocity*=0.5f;
         float foodValue = col.gameObject.GetComponent<Food>().Eat();
         if(foodValue != 0)
+        {
+            foodEaten++;
             spawn.foodCount--;
-        EnergyChange(foodValue*0.35f);
+            EnergyChange(foodValue*0.35f);
+        }
+            
+        
         
     }
 
     void Reproduction()
     {
         GameObject t = Instantiate(circle, new Vector3(transform.position.x, transform.position.y, 100), Quaternion.identity);
-        t.GetComponent<Circle>().Initialization(neural, 1f);
+        t.GetComponent<Circle>().Initialization(neural);
         t.GetComponent<Circle>().generation++;
+        reproductionCount++;
         spawn.circleCount++;
     }
 
@@ -146,6 +165,7 @@ public class Circle: MonoBehaviour {
 
     void Update()
     {
+        
         time += Time.deltaTime;
         if(time > 0)
         {
@@ -163,7 +183,9 @@ public class Circle: MonoBehaviour {
                 float[] p = neural.FeedForward(t[0].x, t[0].y, t[1].x, t[1].y);
                 shape.Move(new Vector2(p[0]*25f, p[1]*25f));
                 
-                time = 0;
+
+                lifetime += time;
+                time = 0; 
             }
         }
     

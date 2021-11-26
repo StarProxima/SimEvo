@@ -77,7 +77,8 @@ public class NeuralNetwork
 
     public NeuralNetwork(NeuralNetwork neural, float mutation = 0)
     {
-        
+        float rand = UnityEngine.Random.value;
+        if(rand > mutation) mutation = 0;
         layers = new Layer[neural.layers.Length];
         this.biasCount = neural.biasCount;
         for (int i = 0; i < neural.layers.Length; i++)
@@ -112,7 +113,7 @@ public class NeuralNetwork
                     
                     
 
-                    float rand = UnityEngine.Random.value;
+                    rand = UnityEngine.Random.value;
                         
                     if(rand < 1f * mutation)
                         layers[i].weights[j, k] += UnityEngine.Random.Range(-0.25f * mutation, 0.25f * mutation);
