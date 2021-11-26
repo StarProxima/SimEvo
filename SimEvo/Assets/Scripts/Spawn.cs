@@ -6,6 +6,8 @@ public class Spawn : MonoBehaviour
 {
     GameObject circle;
     public bool shapeSpawn = false;
+
+    public bool shapeReprodaction = true;
     public int maxShapeCount = 1000;
     public int circleCount = 0;
     public float circleAreaWidth = 1000f;

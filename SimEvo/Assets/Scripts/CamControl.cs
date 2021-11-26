@@ -34,7 +34,7 @@ public class CamControl : MonoBehaviour
 
     void Start()
     {
-        ih = manager.GetComponent<InputHandler>();
+        
         
         Camera.main.orthographicSize = startCamSize;
         futureSize = startCamSize;
@@ -139,14 +139,14 @@ public class CamControl : MonoBehaviour
         // else
         // {
             //Сохраняяем координаты мышки и камеры
-            if (ih.PointerDown())
-                pointerPos = ih.GetPointerPos();
+            if (Input.GetMouseButtonDown(1))
+                pointerPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
             
-            if (ih.Pointer())
+            if (Input.GetMouseButton(1))
             {
                 
-                pointerPosDinamic = ih.GetPointerPos();
+                pointerPosDinamic = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 futurePos = pointerPos - pointerPosDinamic;
                 
                 differencePos = Time.deltaTime*200 < smoothFollowingСursor ? futurePos/smoothFollowingСursor*(Time.deltaTime*200) : futurePos;
@@ -219,7 +219,7 @@ public class CamControl : MonoBehaviour
             
 
         //Расчёт будущего размера камеры
-        float deltaY = ih.GetDeltaY();
+        float deltaY = Input.mouseScrollDelta.y;
         if (deltaY != 0)
         {
             inertiaCam = 0;
@@ -235,7 +235,7 @@ public class CamControl : MonoBehaviour
         size = Camera.main.orthographicSize;
         if (size != futureSize)
         {
-            posForZoom1 = ih.GetPosForZoom();
+            posForZoom1 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             
             difSize = Math.Abs(size - futureSize);
             if (difSize < 0.025f) difSize = 0.025f;
@@ -250,16 +250,16 @@ public class CamControl : MonoBehaviour
 
             if(!followingTarget)
             {
-                posForZoom2 = ih.GetPosForZoom();
+                posForZoom2 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 
 
                 Vector2 differencePos = posForZoom1 - posForZoom2;
                 Vector2 interpolationPos = Camera.main.transform.position + (Vector3)differencePos;
-                //Обработка saveZone
-                if(interpolationPos.x < saveZoneEdge1.x || interpolationPos.x > saveZoneEdge2.x)
-                    differencePos = new Vector2(0, differencePos.y);
-                if(interpolationPos.y < saveZoneEdge1.y || interpolationPos.y > saveZoneEdge2.y)
-                    differencePos = new Vector2(differencePos.x, 0);
+                // //Обработка saveZone
+                // if(interpolationPos.x < saveZoneEdge1.x || interpolationPos.x > saveZoneEdge2.x)
+                //     differencePos = new Vector2(0, differencePos.y);
+                // if(interpolationPos.y < saveZoneEdge1.y || interpolationPos.y > saveZoneEdge2.y)
+                //     differencePos = new Vector2(differencePos.x, 0);
 
                 //Движение камеры к курсору при приближении и обратно
                 Camera.main.transform.position += (Vector3)differencePos;

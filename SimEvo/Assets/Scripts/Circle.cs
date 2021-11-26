@@ -86,11 +86,15 @@ public class Circle: MonoBehaviour {
 
     void Reproduction()
     {
-        GameObject t = Instantiate(circle, new Vector3(transform.position.x, transform.position.y, 100), Quaternion.identity);
-        t.GetComponent<Circle>().Initialization(neural);
-        t.GetComponent<Circle>().generation++;
-        reproductionCount++;
-        spawn.circleCount++;
+        if(spawn.shapeReprodaction)
+        {
+            GameObject t = Instantiate(circle, new Vector3(transform.position.x, transform.position.y, 100), Quaternion.identity);
+            t.GetComponent<Circle>().Initialization(neural);
+            t.GetComponent<Circle>().generation = generation + 1;
+            reproductionCount++;
+            spawn.circleCount++;
+        }
+        
     }
 
 
@@ -141,7 +145,7 @@ public class Circle: MonoBehaviour {
         {
             for(int i = 0; i < colliders.Length; i++)
             {
-                if(colliders[i].name == "Food(Clone)")
+                if(colliders[i].tag == "Food")
                 {
                     Vector2 t = ((Vector2)colliders[i].transform.position-(Vector2)transform.position);
                     if( t.magnitude < result[0].magnitude)
