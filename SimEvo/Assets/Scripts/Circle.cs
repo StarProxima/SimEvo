@@ -48,7 +48,7 @@ public class Circle: MonoBehaviour {
         if(neural != null)
             this.neural = new NeuralNetwork(neural, 0.5f);
         else
-            this.neural = new NeuralNetwork(4, Random.Range(2,8), 2);
+            this.neural = new NeuralNetwork(0, 4, Random.Range(2,8), 2);
             
         //Задержка перед началом движением.
         this.time -= time;  
