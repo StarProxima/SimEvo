@@ -37,7 +37,7 @@ public class Circle: MonoBehaviour {
 
     Rigidbody2D rb;
     GameObject circle;
-
+    
     Spawn spawn;
     float time = 0;
     Shape shape;
@@ -50,15 +50,18 @@ public class Circle: MonoBehaviour {
         manager = Camera.main.GetComponent<CamControl>().manager;
         spawn = manager.GetComponent<Spawn>();
         
-        
+        spawn.circleCount++;
         //DrawCircle();
         if(neural != null)
         {
+            neuronCount = neural.layers[1].neurons.Length;
+            spawn.shapeNeuronCount[neuronCount]++;
             this.neural = new NeuralNetwork(neural, 0.5f);
         }  
         else
         {
-            neuronCount = Random.Range(2,8);
+            neuronCount = Random.Range(1,13);
+            spawn.shapeNeuronCount[neuronCount]++;
             this.neural = new NeuralNetwork(0, 4, neuronCount, 2);
         }
             
@@ -92,7 +95,8 @@ public class Circle: MonoBehaviour {
             t.GetComponent<Circle>().Initialization(neural);
             t.GetComponent<Circle>().generation = generation + 1;
             reproductionCount++;
-            spawn.circleCount++;
+            
+            
         }
         
     }
@@ -128,6 +132,7 @@ public class Circle: MonoBehaviour {
             if(energyDeath)
             {
                 spawn.circleCount--;
+                spawn.shapeNeuronCount[neuronCount]--; 
                 Destroy(gameObject);
             }
         }
@@ -147,22 +152,21 @@ public class Circle: MonoBehaviour {
             {
                 if(colliders[i].tag == "Food")
                 {
-                    Vector2 t = ((Vector2)colliders[i].transform.position-(Vector2)transform.position);
+                    Vector2 t = (Vector2)colliders[i].transform.position-(Vector2)transform.position;
                     if( t.magnitude < result[0].magnitude)
                     {
-                        result[0] = (Vector2)colliders[i].transform.position-(Vector2)transform.position;
+                        result[0] = t;
                     }
                     result[1] += t.normalized;
-                }
-                
-                
-                
+                }  
             }
             if(result[0] == new Vector2(100, 100)) result[0] = Vector2.zero;
         }
         else result[0] = Vector2.zero;
-        result[0].Normalize();
-        result[1].Normalize();
+        
+        result[0] = result[0].normalized * (-Mathf.Log(result[0].magnitude+4f, 2.71f)+4f);
+        result[1]= result[1].normalized * (Mathf.Log10(result[1].magnitude+1)+0.5f);
+
         return result;
     }
 

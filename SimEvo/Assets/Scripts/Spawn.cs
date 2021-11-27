@@ -10,6 +10,8 @@ public class Spawn : MonoBehaviour
     public bool shapeReprodaction = true;
     public int maxShapeCount = 1000;
     public int circleCount = 0;
+
+    public int[] shapeNeuronCount;
     public float circleAreaWidth = 1000f;
     public float circleAreaHeight = 600f;
     
@@ -32,6 +34,9 @@ public class Spawn : MonoBehaviour
     Vector3 randPos;
     void Start()
     {
+        shapeNeuronCount = new int[32];
+        for (int i = 0; i < shapeNeuronCount.Length; i++) shapeNeuronCount[i] = 0;
+
         circle = (GameObject)Resources.Load("Circle", typeof(GameObject));
         food = (GameObject)Resources.Load("Food", typeof(GameObject));
     }
@@ -64,7 +69,7 @@ public class Spawn : MonoBehaviour
             {
                 GameObject t = Instantiate(circle, new Vector3(Random.Range(-foodAreaWidth/2, foodAreaWidth/2), Random.Range(-foodAreaHeight/2, foodAreaHeight/2), 100), Quaternion.identity);
                 t.GetComponent<Circle>().Initialization();
-                circleCount++;
+                
                 shapeTime = 0;
             }
         } 
