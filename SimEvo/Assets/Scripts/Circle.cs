@@ -34,17 +34,19 @@ public class Circle: MonoBehaviour {
     float width = -1f;
 
     
-    Collider2D[] nearestColliders;
+    Collider2D[] nearestColliders1, nearestColliders2;
 
     Collider2D[][] сolliders;
     int colIndex = 0; 
 
     Rigidbody2D rb;
     GameObject circle;
-    
+    Vector2 lastMove;
     Spawn spawn;
-    float time = 0;
+    float time = 0, timeNeural = 0, timeNeurlaAuxiliary = 0, timeNearestColliders2 = 0;
     Shape shape;
+
+    float[] neuralOutput, neuralAuxiliaryOutput;
     public void Initialization(NeuralNetwork neural = null, NeuralNetwork neuralAuxiliary = null, float time = 0)
     {
         shape = new Shape(gameObject, maxSpeed, maxRotateSpeed);
@@ -58,8 +60,11 @@ public class Circle: MonoBehaviour {
         for(int i = 0; i < 5; i++)
             сolliders[i] = new Collider2D[0];
         spawn.circleCount++;
+
+        
+        nearestColliders2 = Physics2D.OverlapCircleAll(transform.position, 30f);
         //DrawCircle();
-        if(neural != null)
+        if (neural != null)
         {
             neuronCount = neural.layers[1].neurons.Length;
             spawn.shapeNeuronCount[neuronCount]++;
@@ -71,7 +76,7 @@ public class Circle: MonoBehaviour {
             neuronCount = Random.Range(1,13);
             spawn.shapeNeuronCount[neuronCount]++;
             this.neural = new NeuralNetwork(0, 4, neuronCount, 2);
-            this.neuralAuxiliary = new NeuralNetwork(0, 4, neuronCount, 1);
+            this.neuralAuxiliary = new NeuralNetwork(0, 4, neuronCount, 2);
         }
             
             
@@ -184,6 +189,7 @@ public class Circle: MonoBehaviour {
         {
             for (int i = 0; i < colliders.Length; i++)
             {
+                if(colliders[i] != null)
                 if (colliders[i].tag == "Food")
                 {
 
@@ -205,21 +211,24 @@ public class Circle: MonoBehaviour {
     {
         
         time += Time.deltaTime;
-        if(time > 0)
+        timeNeural += Time.deltaTime;
+        timeNeurlaAuxiliary += Time.deltaTime;
+        timeNearestColliders2 += Time.deltaTime;
+        if (time > 0)
         {
             shape.RotateProcess();
             shape.MoveProcess();
 
-            if(time > 0.5f)
+            if(timeNeural > 0.5f)
             {
 
 
                 Vector2[] t;
-                Vector2 t2;
+
 
                 //nearestColliders = Physics2D.OverlapCircleAll((Vector2)transform.position, 10f);
-                nearestColliders = Physics2D.OverlapCircleAll((Vector2)transform.position + shape.DirFromAngle(transform.rotation.eulerAngles.z)*7.5f, 15f);
-                //Debug.DrawRay(transform.position, shape.DirFromAngle(transform.rotation.eulerAngles.z)*5f, Color.cyan, 1f);
+                nearestColliders1 = Physics2D.OverlapCircleAll((Vector2)transform.position + shape.DirFromAngle(transform.rotation.eulerAngles.z)*7.5f, 15f);
+                //Debug.DrawRay(transform.position, shape.DirFromAngle(transform.rotation.eulerAngles.z) * 7.5f, Color.cyan, 1f);
 
 
                 // сolliders[colIndex++%5] = Physics2D.OverlapCircleAll(transform.position, 10f);
@@ -239,18 +248,45 @@ public class Circle: MonoBehaviour {
                 // HashSet<Collider2D> set = new HashSet<Collider2D>(h);
                 // set.CopyTo(h, 0);
 
-                t = СlosestAndCenterMassFood(nearestColliders);
-                nearestColliders = Physics2D.OverlapCircleAll(transform.position, 20f);
-                t2 = CenterMassFood(nearestColliders);
-                float[] p = neural.FeedForward(t[0].x, t[0].y, t[1].x, t[1].y);
-                shape.Move(new Vector2(p[0]*25f, p[1]*25f));
+                t = СlosestAndCenterMassFood(nearestColliders1);
+                if (t[0] == Vector2.zero)
+                {
+                    if(neuralAuxiliaryOutput != null)
+                    t[0] = new Vector2(neuralAuxiliaryOutput[0], neuralAuxiliaryOutput[0]);
+                }
 
-                float[] p2 = neuralAuxiliary.FeedForward(p[0], p[1], t2.x, t2.y);
-                shape.RotateTo(transform.rotation.eulerAngles.z + p2[0]*10f);
+                neuralOutput = neural.FeedForward(t[0].x, t[0].y, t[1].x, t[1].y);
+                
+                shape.Move(new Vector2(neuralOutput[0]*25f, neuralOutput[1] * 25f));
+                
+                
                 //Debug.Log(Mathf.Acos(temp.x)/ Mathf.Deg2Rad);
 
-                lifetime += time;
-                time = 0; 
+                
+                timeNeural = 0; 
+            }
+
+            if(timeNeurlaAuxiliary > 1f)
+            {
+                
+                Vector2 t2 = CenterMassFood(nearestColliders2);
+
+                neuralAuxiliaryOutput = neuralAuxiliary.FeedForward(neuralOutput[0], neuralOutput[1], t2.x, t2.y);
+
+                Vector2 temp = new Vector2(neuralAuxiliaryOutput[0], neuralAuxiliaryOutput[1]);
+
+                //temp.Normalize();
+                shape.RotateTo(transform.rotation.eulerAngles.z + Mathf.Atan2(neuralAuxiliaryOutput[0], neuralAuxiliaryOutput[1])*Mathf.Rad2Deg / 2f);
+                //Debug.Log(Mathf.Atan2(p2[0], p2[1]) * Mathf.Rad2Deg);
+
+                lifetime += timeNeurlaAuxiliary;
+                timeNeurlaAuxiliary = 0;
+            }
+
+            if (timeNearestColliders2 > 3f)
+            {
+                nearestColliders2 = Physics2D.OverlapCircleAll(transform.position, 30f);
+                timeNearestColliders2 = 0;
             }
         }
     
