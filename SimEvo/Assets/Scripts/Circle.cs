@@ -11,18 +11,18 @@ public class Circle: MonoBehaviour {
 
 
     //Parametrs
+    [SerializeField] bool energyDeath = true;
     [SerializeField] float energy = 20;
     float maxEnergy = 100;
     float maxSpeed = 10;
     float maxRotateSpeed = 50;
-    [SerializeField] bool energyDeath = true;
+    
 
     //Stats
     public int generation = 0;
     public int reproductionCount = 0;
     public float lifetime = 0;
     public int neuronCount = 0;
-    
     public int foodEaten = 0;
     
 
@@ -34,17 +34,21 @@ public class Circle: MonoBehaviour {
     float width = -1f;
 
     
-    Collider2D[] nearestColliders1, nearestColliders2;
+    Collider2D[] collidersNeural, collidersNeuralAuxiliary;
 
-    Collider2D[][] сolliders;
+    
     int colIndex = 0; 
 
     Rigidbody2D rb;
     GameObject circle;
     Vector2 lastMove;
     Spawn spawn;
-    float time = 0, timeNeural = 0, timeNeurlaAuxiliary = 0, timeNearestColliders2 = 0;
+    
     Shape shape;
+
+    //Time
+    float time = 0, timeNeural = 0, timeNeurlaAuxiliary = 0, timeNearestColliders2 = 0;
+    float delayNeural = 0.25f, delayNeurlaAuxiliary = 1f, delayCollidersNeuralAuxiliary = 5f;
 
     float[] neuralOutput, neuralAuxiliaryOutput;
     public void Initialization(NeuralNetwork neural = null, NeuralNetwork neuralAuxiliary = null, float time = 0)
@@ -56,27 +60,27 @@ public class Circle: MonoBehaviour {
         manager = Camera.main.GetComponent<CamControl>().manager;
         spawn = manager.GetComponent<Spawn>();
 
-        сolliders = new Collider2D[5][];
-        for(int i = 0; i < 5; i++)
-            сolliders[i] = new Collider2D[0];
+       
         spawn.circleCount++;
 
-        
-        nearestColliders2 = Physics2D.OverlapCircleAll(transform.position, 30f);
+
+        collidersNeuralAuxiliary = Physics2D.OverlapCircleAll(transform.position, 30f);
         //DrawCircle();
         if (neural != null)
         {
-            neuronCount = neural.layers[1].neurons.Length;
+            
+            
+            this.neural = new NeuralNetwork(neural, 0.5f, 0.5f);
+            this.neuralAuxiliary = new NeuralNetwork(neuralAuxiliary, 0.4f, 0f);
+            neuronCount = this.neural.layers[1].neurons.Length;
             spawn.shapeNeuronCount[neuronCount]++;
-            this.neural = new NeuralNetwork(neural, 0.5f);
-            this.neuralAuxiliary = new NeuralNetwork(neuralAuxiliary, 0.2f);
         }  
         else
         {
             neuronCount = Random.Range(1,13);
             spawn.shapeNeuronCount[neuronCount]++;
             this.neural = new NeuralNetwork(0, 4, neuronCount, 2);
-            this.neuralAuxiliary = new NeuralNetwork(0, 4, neuronCount, 2);
+            this.neuralAuxiliary = new NeuralNetwork(0, 4, 4, 2);
         }
             
             
@@ -128,7 +132,7 @@ public class Circle: MonoBehaviour {
     {
         if(energy > 0)
         {
-            energy -= Time.deltaTime;
+            energy -= (0.25f + Mathf.Pow(shape.rb.velocity.sqrMagnitude, 1/8)) * Time.deltaTime;
             if(energy > 70)
             {
                 Reproduction();
@@ -181,8 +185,6 @@ public class Circle: MonoBehaviour {
 
     Vector2 CenterMassFood(Collider2D[] colliders)
     {
-        
-
         Vector2 result = Vector2.zero;
 
         if (colliders != null)
@@ -198,10 +200,13 @@ public class Circle: MonoBehaviour {
                     result += t.normalized;
                 }
             }
-            
+            result = result.normalized * (Mathf.Log10(result.magnitude + 1) + 0.5f);
         }
-
-        result = result.normalized * (Mathf.Log10(result.magnitude + 1) + 0.5f);
+        else
+        {
+            result = new Vector2(Random.Range(-10f,10f), Random.Range(-10f, 10f));
+        }
+        
 
         return result;
     }
@@ -219,15 +224,15 @@ public class Circle: MonoBehaviour {
             shape.RotateProcess();
             shape.MoveProcess();
 
-            if(timeNeural > 0.5f)
+            if(timeNeural > delayNeural)
             {
 
 
-                Vector2[] t;
+                
 
 
                 //nearestColliders = Physics2D.OverlapCircleAll((Vector2)transform.position, 10f);
-                nearestColliders1 = Physics2D.OverlapCircleAll((Vector2)transform.position + shape.DirFromAngle(transform.rotation.eulerAngles.z)*7.5f, 15f);
+                collidersNeural = Physics2D.OverlapCircleAll((Vector2)transform.position + shape.DirFromAngle(transform.rotation.eulerAngles.z)*7.5f, 15f);
                 //Debug.DrawRay(transform.position, shape.DirFromAngle(transform.rotation.eulerAngles.z) * 7.5f, Color.cyan, 1f);
 
 
@@ -248,11 +253,12 @@ public class Circle: MonoBehaviour {
                 // HashSet<Collider2D> set = new HashSet<Collider2D>(h);
                 // set.CopyTo(h, 0);
 
-                t = СlosestAndCenterMassFood(nearestColliders1);
+                Vector2[] t = СlosestAndCenterMassFood(collidersNeural);
                 if (t[0] == Vector2.zero)
                 {
                     if(neuralAuxiliaryOutput != null)
                     t[0] = new Vector2(neuralAuxiliaryOutput[0], neuralAuxiliaryOutput[0]);
+                    t[1] = t[0];
                 }
 
                 neuralOutput = neural.FeedForward(t[0].x, t[0].y, t[1].x, t[1].y);
@@ -266,10 +272,16 @@ public class Circle: MonoBehaviour {
                 timeNeural = 0; 
             }
 
-            if(timeNeurlaAuxiliary > 1f)
+            if (timeNearestColliders2 > delayCollidersNeuralAuxiliary)
+            {
+                collidersNeuralAuxiliary = Physics2D.OverlapCircleAll(transform.position, 30f);
+                timeNearestColliders2 = 0;
+            }
+
+            if (timeNeurlaAuxiliary > delayNeurlaAuxiliary)
             {
                 
-                Vector2 t2 = CenterMassFood(nearestColliders2);
+                Vector2 t2 = CenterMassFood(collidersNeuralAuxiliary);
 
                 neuralAuxiliaryOutput = neuralAuxiliary.FeedForward(neuralOutput[0], neuralOutput[1], t2.x, t2.y);
 
@@ -283,11 +295,7 @@ public class Circle: MonoBehaviour {
                 timeNeurlaAuxiliary = 0;
             }
 
-            if (timeNearestColliders2 > 3f)
-            {
-                nearestColliders2 = Physics2D.OverlapCircleAll(transform.position, 30f);
-                timeNearestColliders2 = 0;
-            }
+            
         }
     
         EnergyControl();

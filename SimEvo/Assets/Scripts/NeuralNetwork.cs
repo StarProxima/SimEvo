@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
+//using System;
 
 public class Layer
 {
@@ -62,64 +62,92 @@ public class NeuralNetwork
                 }
                     
                 for (int j = 0; j < sizes[i] + isBiasLayer; j++)
+                {
+                    for (int k = 0; k < nextSize; k++)
                     {
-                        for (int k = 0; k < nextSize; k++)
-                        {
-                            layers[i].weights[j, k] = UnityEngine.Random.Range(-1f, 1f);
-                        }
+                        layers[i].weights[j, k] = UnityEngine.Random.Range(-1f, 1f);
                     }
+                }
                 
             }
-           
-
-        
     }
 
-    public NeuralNetwork(NeuralNetwork neural, float mutation = 0)
+    public NeuralNetwork(NeuralNetwork neural, float mutationWeights = 0, float mutationNeurons = 0)
     {
+
+        int[] sizes = new int[neural.layers.Length];
+        for(int i = 0; i < neural.layers.Length; i++)
+        {
+            sizes[i] = neural.layers[i].size;
+        }
         float rand = UnityEngine.Random.value;
-        if(rand > mutation) mutation = 0;
+        
+        int randNeuron;
+        if (rand > mutationWeights)
+        {
+            mutationWeights = 0;
+        }
+        
+
+
         layers = new Layer[neural.layers.Length];
         this.biasCount = neural.biasCount;
         for (int i = 0; i < neural.layers.Length; i++)
         {
+            randNeuron = 0;
             int nextSize = 0;
             int isBiasLayer = 0;
 
-            if(i < neural.layers.Length-1)
+            if (i < neural.layers.Length - 2 && mutationWeights != 0)
+            {
+                float randNeurons = UnityEngine.Random.value;
+                if (randNeurons < mutationNeurons)
+                {
+                    randNeuron = Random.Range(-1, 2);
+                    sizes[i+1] += randNeuron;
+                }
+
+            }
+
+
+            if (i < neural.layers.Length-1)
             {
                 if(i+1 < biasCount)
-                    nextSize = neural.layers[i+1].size-1;
+                    nextSize = sizes[i+1] - 1;
                 else
-                    nextSize = neural.layers[i+1].size;
+                    nextSize = sizes[i+1];
             }
-        
+            
+
             if(i < neural.biasCount)
             {
                 isBiasLayer = 1;
-                layers[i] = new Layer(neural.layers[i].size -1, nextSize, true);
+                layers[i] = new Layer(sizes[i] - 1, nextSize, true);
             }  
             else
             {
-                layers[i] = new Layer(neural.layers[i].size, nextSize, false);
+                layers[i] = new Layer(sizes[i], nextSize, false);
             }
                  
 
-            for (int j = 0; j < neural.layers[i].size -1 + isBiasLayer; j++)
+            for (int j = 0; j < sizes[i] - 1 + isBiasLayer; j++)
             {
                 for (int k = 0; k < nextSize; k++)
                 {
-                    layers[i].weights[j, k] = neural.layers[i].weights[j,k];
-                    
-                    
+                    if(randNeuron != 1 && j < sizes[i] - 1 + isBiasLayer -1)
+                        layers[i].weights[j, k] = neural.layers[i].weights[j,k];
+                    else layers[i].weights[j, k] = UnityEngine.Random.Range(-1f, 1f);
+
+
+
 
                     rand = UnityEngine.Random.value;
                         
-                    if(rand < 1f * mutation)
-                        layers[i].weights[j, k] += UnityEngine.Random.Range(-0.25f * mutation, 0.25f * mutation);
+                    if(rand < 1f * mutationWeights)
+                        layers[i].weights[j, k] += UnityEngine.Random.Range(-0.25f * mutationWeights, 0.25f * mutationWeights);
                         //layers[i].weights[j, k] = w + UnityEngine.Random.Range(-Mathf.Min(0.05f, 1 + w), Mathf.Min(0.05f, 1 - w));
-                    if(rand < 0.2f * mutation)
-                        layers[i].weights[j, k] += UnityEngine.Random.Range(-2f * mutation, 2f * mutation);
+                    if(rand < 0.2f * mutationWeights)
+                        layers[i].weights[j, k] += UnityEngine.Random.Range(-2f * mutationWeights, 2f * mutationWeights);
                         //layers[i].weights[j, k] = w + UnityEngine.Random.Range(-Mathf.Min(0.5f, 1 + w), Mathf.Min(0.5f, 1 - w));
                 }
             } 
