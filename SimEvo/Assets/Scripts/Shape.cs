@@ -61,7 +61,7 @@ public class Shape
         }
     }
 
-    Vector2 DirFromAngle(float angle)
+    public Vector2 DirFromAngle(float angle)
     {
         return new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle* Mathf.Deg2Rad));
     }
