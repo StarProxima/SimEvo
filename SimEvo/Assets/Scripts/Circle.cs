@@ -14,7 +14,7 @@ public class Circle: MonoBehaviour {
     [SerializeField] bool energyDeath = true;
     [SerializeField] float energy = 20;
     float maxEnergy = 100;
-    float maxSpeed = 10;
+    float maxSpeed = 100;
     float maxRotateSpeed = 50;
     
 
@@ -48,7 +48,7 @@ public class Circle: MonoBehaviour {
 
     //Time
     float time = 0, timeNeural = 0, timeNeurlaAuxiliary = 0, timeCollidersNeuralAuxiliary = 0;
-    float delayNeural = 0.33f, delayNeurlaAuxiliary = 1f, delayCollidersNeuralAuxiliary = 7.5f;
+    float delayNeural = 0.33f, delayNeurlaAuxiliary = 0.5f, delayCollidersNeuralAuxiliary = 7.5f;
 
     float[] neuralOutput, neuralAuxiliaryOutput;
     public void Initialization(NeuralNetwork neural = null, NeuralNetwork neuralAuxiliary = null, float time = 0)
@@ -72,13 +72,13 @@ public class Circle: MonoBehaviour {
             
             
             this.neural = new NeuralNetwork(neural, 0.5f, 0.4f);
-            this.neuralAuxiliary = new NeuralNetwork(neuralAuxiliary, 0.25f, 0f);
+            this.neuralAuxiliary = new NeuralNetwork(neuralAuxiliary, 0.25f, 0.1f);
             neuronCount = this.neural.layers[1].neurons.Length;
             spawn.shapeNeuronCount[neuronCount]++;
         }  
         else
         {
-            neuronCount = Random.Range(1,13);
+            neuronCount = Random.Range(2,9);
             spawn.shapeNeuronCount[neuronCount]++;
             this.neural = new NeuralNetwork(0, 5, neuronCount, 2);
             this.neuralAuxiliary = new NeuralNetwork(0, 4, 2, 2);
@@ -276,7 +276,7 @@ public class Circle: MonoBehaviour {
 
             if (timeCollidersNeuralAuxiliary > delayCollidersNeuralAuxiliary)
             {
-                collidersNeuralAuxiliary = Physics2D.OverlapCircleAll(transform.position, 30f);
+                collidersNeuralAuxiliary = Physics2D.OverlapCircleAll(transform.position, 20f);
                 t2 = CenterMassFood(collidersNeuralAuxiliary);
                 timeCollidersNeuralAuxiliary = 0;
             }
@@ -286,7 +286,7 @@ public class Circle: MonoBehaviour {
 
                 neuralAuxiliaryOutput = neuralAuxiliary.FeedForward(neuralOutput[0], neuralOutput[1], t2.x, t2.y);
 
-                shape.RotateTo(transform.rotation.eulerAngles.z + Mathf.Atan2(neuralAuxiliaryOutput[0], neuralAuxiliaryOutput[1])*Mathf.Rad2Deg / 2f);
+                shape.RotateTo((transform.rotation.eulerAngles.z + Mathf.Atan2(neuralAuxiliaryOutput[0], neuralAuxiliaryOutput[1])*Mathf.Rad2Deg) / 2f);
                 
                 lifetime += timeNeurlaAuxiliary;
                 timeNeurlaAuxiliary = 0;
