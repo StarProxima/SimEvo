@@ -14,6 +14,8 @@ public class DebugScreen : MonoBehaviour {
         QualitySettings.vSyncCount = 0;
         Application.runInBackground = true;
         Application.targetFrameRate = 1200;
+        //Screen.fullScreen = true;
+        Screen.SetResolution(2560, 1440, true);
 
         shapeNeuronCount = new int[32];
         for (int i = 0; i < shapeNeuronCount.Length; i++) shapeNeuronCount[i] = 0;
@@ -48,7 +50,11 @@ public class DebugScreen : MonoBehaviour {
         GUI.Label(new Rect(30, 270, 100, 34), "Shape10: " + shapeNeuronCount[10], style[1]);
         GUI.Label(new Rect(30, 290, 100, 34), "Shape11: " + shapeNeuronCount[11], style[1]);
         GUI.Label(new Rect(30, 310, 100, 34), "Shape12: " + shapeNeuronCount[12], style[1]);
-        
+        GUI.Label(new Rect(30, 330, 100, 34), "Shape13: " + shapeNeuronCount[13], style[1]);
+        GUI.Label(new Rect(30, 350, 100, 34), "Shape14: " + shapeNeuronCount[14], style[1]);
+        GUI.Label(new Rect(30, 370, 100, 34), "Shape15: " + shapeNeuronCount[15], style[1]);
+        GUI.Label(new Rect(30, 390, 100, 34), "Shape16: " + shapeNeuronCount[16], style[1]);
+
     }
  
     void Update() {

@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5258381924999013930}
   - component: {fileID: 2857323298886108504}
   m_Layer: 7
-  m_Name: Food
+  m_Name: Food 2
   m_TagString: Food
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -77,16 +77,16 @@ LineRenderer:
   m_SortingOrder: 0
   m_Positions:
   - {x: 0, y: 0, z: 0}
-  - {x: 0.4, y: 0, z: 1}
+  - {x: 0.54, y: 0, z: 1}
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 1
+    widthMultiplier: 1.000536
     widthCurve:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0.27748013
-        value: 0.39429337
+        time: 0.3103323
+        value: 0.52355057
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -146,7 +146,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.20000003, y: 0}
+  m_Offset: {x: 0.27, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -157,7 +157,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.1, y: 0.1}
+  m_Size: {x: 0.27, y: 0.27}
   m_EdgeRadius: 0
 --- !u!114 &2857323298886108504
 MonoBehaviour:
@@ -171,3 +171,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f3de165122ba294d84f7d0548504edf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  foodValue: 10

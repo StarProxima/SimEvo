@@ -7200,8 +7200,8 @@ MonoBehaviour:
   foodSpawn: 0
   maxFoodCount: 30000
   foodCount: 0
-  foodAreaWidth: 1300
-  foodAreaHeight: 800
+  foodAreaWidth: 1600
+  foodAreaHeight: 1000
   foodPerSec: 800
   ratioFood: 0.3
   foodGroupSpawn: 0

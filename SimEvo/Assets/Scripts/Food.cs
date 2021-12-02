@@ -7,7 +7,7 @@ public class Food : MonoBehaviour
 
     bool notEaten = true;
 
-    float foodValue = 10;
+    public float foodValue = 10;
     public float Eat()
     {
         if(notEaten)

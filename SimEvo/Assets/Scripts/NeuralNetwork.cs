@@ -104,7 +104,8 @@ public class NeuralNetwork
                 if (randNeurons < mutationNeurons)
                 {
                     randNeuron = Random.Range(-1, 2);
-                    sizes[i+1] += randNeuron;
+                    if(sizes[i + 1] > 1 && sizes[i + 1] < 16)
+                        sizes[i+1] += randNeuron;
                 }
 
             }

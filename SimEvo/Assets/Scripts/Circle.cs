@@ -43,12 +43,12 @@ public class Circle: MonoBehaviour {
     GameObject circle;
     Vector2 lastMove;
     Spawn spawn;
-    
+    Vector2 t2;
     Shape shape;
 
     //Time
-    float time = 0, timeNeural = 0, timeNeurlaAuxiliary = 0, timeNearestColliders2 = 0;
-    float delayNeural = 0.25f, delayNeurlaAuxiliary = 1f, delayCollidersNeuralAuxiliary = 5f;
+    float time = 0, timeNeural = 0, timeNeurlaAuxiliary = 0, timeCollidersNeuralAuxiliary = 0;
+    float delayNeural = 0.33f, delayNeurlaAuxiliary = 1f, delayCollidersNeuralAuxiliary = 7.5f;
 
     float[] neuralOutput, neuralAuxiliaryOutput;
     public void Initialization(NeuralNetwork neural = null, NeuralNetwork neuralAuxiliary = null, float time = 0)
@@ -65,13 +65,14 @@ public class Circle: MonoBehaviour {
 
 
         collidersNeuralAuxiliary = Physics2D.OverlapCircleAll(transform.position, 30f);
+        t2 = CenterMassFood(collidersNeuralAuxiliary);
         //DrawCircle();
         if (neural != null)
         {
             
             
-            this.neural = new NeuralNetwork(neural, 0.5f, 0.5f);
-            this.neuralAuxiliary = new NeuralNetwork(neuralAuxiliary, 0.4f, 0f);
+            this.neural = new NeuralNetwork(neural, 0.5f, 0.4f);
+            this.neuralAuxiliary = new NeuralNetwork(neuralAuxiliary, 0.25f, 0f);
             neuronCount = this.neural.layers[1].neurons.Length;
             spawn.shapeNeuronCount[neuronCount]++;
         }  
@@ -79,8 +80,8 @@ public class Circle: MonoBehaviour {
         {
             neuronCount = Random.Range(1,13);
             spawn.shapeNeuronCount[neuronCount]++;
-            this.neural = new NeuralNetwork(0, 4, neuronCount, 2);
-            this.neuralAuxiliary = new NeuralNetwork(0, 4, 4, 2);
+            this.neural = new NeuralNetwork(0, 5, neuronCount, 2);
+            this.neuralAuxiliary = new NeuralNetwork(0, 4, 2, 2);
         }
             
             
@@ -97,6 +98,7 @@ public class Circle: MonoBehaviour {
         {
             foodEaten++;
             spawn.foodCount--;
+            
             EnergyChange(foodValue*0.35f);
         }
     }
@@ -218,7 +220,7 @@ public class Circle: MonoBehaviour {
         time += Time.deltaTime;
         timeNeural += Time.deltaTime;
         timeNeurlaAuxiliary += Time.deltaTime;
-        timeNearestColliders2 += Time.deltaTime;
+        timeCollidersNeuralAuxiliary += Time.deltaTime;
         if (time > 0)
         {
             shape.RotateProcess();
@@ -261,7 +263,7 @@ public class Circle: MonoBehaviour {
                     t[1] = t[0];
                 }
 
-                neuralOutput = neural.FeedForward(t[0].x, t[0].y, t[1].x, t[1].y);
+                neuralOutput = neural.FeedForward(t[0].x, t[0].y, t[1].x, t[1].y, 1f/energy);
                 
                 shape.Move(new Vector2(neuralOutput[0]*25f, neuralOutput[1] * 25f));
                 
@@ -272,25 +274,20 @@ public class Circle: MonoBehaviour {
                 timeNeural = 0; 
             }
 
-            if (timeNearestColliders2 > delayCollidersNeuralAuxiliary)
+            if (timeCollidersNeuralAuxiliary > delayCollidersNeuralAuxiliary)
             {
                 collidersNeuralAuxiliary = Physics2D.OverlapCircleAll(transform.position, 30f);
-                timeNearestColliders2 = 0;
+                t2 = CenterMassFood(collidersNeuralAuxiliary);
+                timeCollidersNeuralAuxiliary = 0;
             }
 
             if (timeNeurlaAuxiliary > delayNeurlaAuxiliary)
             {
-                
-                Vector2 t2 = CenterMassFood(collidersNeuralAuxiliary);
 
                 neuralAuxiliaryOutput = neuralAuxiliary.FeedForward(neuralOutput[0], neuralOutput[1], t2.x, t2.y);
 
-                Vector2 temp = new Vector2(neuralAuxiliaryOutput[0], neuralAuxiliaryOutput[1]);
-
-                //temp.Normalize();
                 shape.RotateTo(transform.rotation.eulerAngles.z + Mathf.Atan2(neuralAuxiliaryOutput[0], neuralAuxiliaryOutput[1])*Mathf.Rad2Deg / 2f);
-                //Debug.Log(Mathf.Atan2(p2[0], p2[1]) * Mathf.Rad2Deg);
-
+                
                 lifetime += timeNeurlaAuxiliary;
                 timeNeurlaAuxiliary = 0;
             }

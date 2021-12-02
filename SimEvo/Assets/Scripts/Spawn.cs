@@ -17,7 +17,7 @@ public class Spawn : MonoBehaviour
     
     public float shapePerSec = 10f; 
 
-    GameObject food;
+    GameObject food0, food1, food2;
     public bool foodSpawn = true;
     public int maxFoodCount = 10000;
     public int foodCount = 0;
@@ -38,7 +38,9 @@ public class Spawn : MonoBehaviour
         for (int i = 0; i < shapeNeuronCount.Length; i++) shapeNeuronCount[i] = 0;
 
         circle = (GameObject)Resources.Load("Circle", typeof(GameObject));
-        food = (GameObject)Resources.Load("Food", typeof(GameObject));
+        food0 = (GameObject)Resources.Load("Food 0", typeof(GameObject));
+        food1 = (GameObject)Resources.Load("Food 1", typeof(GameObject));
+        food2 = (GameObject)Resources.Load("Food 2", typeof(GameObject));
     }
 
     // IEnumerator SpawnFoodProcess()
@@ -83,7 +85,20 @@ public class Spawn : MonoBehaviour
                 {
                     for(int i = 0; i < foodGroupSize; i++)
                     {
-                        Instantiate(food, new Vector3(Random.Range(-foodAreaWidth/2, foodAreaWidth/2), Random.Range(-foodAreaHeight/2, foodAreaHeight/2), 100), Quaternion.Euler(0,0,Random.Range(0,360)));
+                        int rand = Random.Range(5, 20);
+                        if(rand < 10)
+                        {
+                            Instantiate(food0, new Vector3(Random.Range(-foodAreaWidth / 2, foodAreaWidth / 2), Random.Range(-foodAreaHeight / 2, foodAreaHeight / 2), 100), Quaternion.Euler(0, 0, Random.Range(0, 360)));
+                        }
+                        else if (rand < 15)
+                        {
+                            Instantiate(food1, new Vector3(Random.Range(-foodAreaWidth / 2, foodAreaWidth / 2), Random.Range(-foodAreaHeight / 2, foodAreaHeight / 2), 100), Quaternion.Euler(0, 0, Random.Range(0, 360)));
+                        }
+                        else if (rand < 20)
+                        {
+                            Instantiate(food2, new Vector3(Random.Range(-foodAreaWidth / 2, foodAreaWidth / 2), Random.Range(-foodAreaHeight / 2, foodAreaHeight / 2), 100), Quaternion.Euler(0, 0, Random.Range(0, 360)));
+                        }
+
                     }
                 }
                 else
@@ -91,8 +106,21 @@ public class Spawn : MonoBehaviour
                     randPos = new Vector3(Random.Range(-foodAreaWidth/2, foodAreaWidth/2), Random.Range(-foodAreaHeight/2, foodAreaHeight/2), 100);
                     for(int i = 0; i < foodGroupSize; i++)
                     {
-                        randPos = randPos + new Vector3(Random.Range(-Mathf.Log(foodGroupSize,2), Mathf.Log(foodGroupSize,2)),Random.Range(-Mathf.Log(foodGroupSize,2), Mathf.Log(foodGroupSize,2)),0);
-                        Instantiate(food, randPos, Quaternion.Euler(0,0,Random.Range(0,360)));
+                        randPos = randPos + new Vector3(Random.Range(-Mathf.Log(foodGroupSize,1.5f), Mathf.Log(foodGroupSize, 1.5f)),Random.Range(-Mathf.Log(foodGroupSize, 1.5f), Mathf.Log(foodGroupSize, 1.5f)),0);
+                        
+                        int rand = Random.Range(5, 20);
+                        if (rand < 10)
+                        {
+                            Instantiate(food0, randPos, Quaternion.Euler(0, 0, Random.Range(0, 360)));
+                        }
+                        else if (rand < 15)
+                        {
+                            Instantiate(food1, randPos, Quaternion.Euler(0, 0, Random.Range(0, 360)));
+                        }
+                        else if (rand < 20)
+                        {
+                            Instantiate(food2, randPos, Quaternion.Euler(0, 0, Random.Range(0, 360)));
+                        }
                     }
                 } 
                 //if(foodGroupSpawn) randPos = new Vector3(Random.Range(-foodAreaWidth/2, foodAreaWidth/2), Random.Range(-foodAreaHeight/2, foodAreaHeight/2), 100);
